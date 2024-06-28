@@ -3,7 +3,7 @@ Các công việc đã làm:
 - Tìm hiểu 4 tính chất của OOP
 - Tìm hiểu 5 tính chất của SOLID
 - Xây dựng chương trình java áp dụng tính chất OOP
-- Viết trương trình java đọc ghi file theo 2 dạng binary và text
+- Viết trương trình java đọc ghi file theo 2dạng binary và text
 - Viết trương trình java thao tác với file và thư mục: list các file, đọc nội dung file
 
 ## Tìm hiểu lý thuyết về lập trình hướng đối tượng (OOP) và nguyên lý SOLID
@@ -19,10 +19,10 @@ Các khái niệm cơ bản trong OOP bao gồm:
 ### Nguyên lý SOLID
 
 Các nguyên lý SOLID bao gồm:
-- **S (Single Responsibility Principle)**: Một lớp chỉ nên có một lý do để thay đổi.
+- **S (Single Responsibility Principle)**: Một lớp chỉ nên có một chức năng cụ thể,.
 - **O (Open/Closed Principle)**: Mở cho mở rộng (extension), đóng cho sửa đổi (modification). Mã nguồn nên mở rộng được mà không cần sửa đổi.
 - **L (Liskov Substitution Principle)**: Các đối tượng của lớp con có thể thay thế đối tượng của lớp cha mà không làm thay đổi tính đúng đắn của chương trình.
-- **I (Interface Segregation Principle)**: Nên tách các interface thành các interface nhỏ, cụ thể để các lớp chỉ phụ thuộc vào những gì cần thiết cho họ.
+- **I (Interface Segregation Principle)**: Nên tách các interface thành các interface nhỏ, cụ thể để các lớp chỉ phụ thuộc vào những gì cần thiết.
 - **D (Dependency Inversion Principle)**: Các module cấp cao không nên phụ thuộc vào các module cấp thấp. Cả hai nên phụ thuộc vào các abstraction. Các abstraction không nên phụ thuộc vào chi tiết, mà ngược lại.
 
 ### Khái niệm Interface và Static
@@ -75,6 +75,6 @@ Các nguyên lý SOLID bao gồm:
   - Lớp `Account` được thiết kế là lớp trừu tượng, định nghĩa các phương thức trừu tượng như `withdraw` mà các lớp con cụ thể phải triển khai.
   - Tách biệt khái niệm logic và thực thi, giúp dễ dàng mở rộng và bảo trì mã nguồn.
 
-### Yêu cầu (2) Đọc ghi file 
+### Yêu cầu (2) Đọc ghi file <DONE>
 - viết trương trình java đọc ghi file theo 2 dạng binary và text
 - viết trương trình java thao tác với file và thư mục: list các file, đọc nội dung file
