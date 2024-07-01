@@ -57,6 +57,9 @@ Các nguyên lý SOLID bao gồm:
   - `DisplayStrategy`: Interface định nghĩa các phương thức display để hiển thị thông tin khách hàng và các loại tài khoản.
   - `SimpleDisplayStrategy`: Lớp implement `DisplayStrategy` để hiển thị thông tin khách hàng và các tài khoản, bao gồm thông tin tài khoản tiết kiệm và thanh toán.
 
+  ![Class diagram](uml.png)
+
+
 ### 2. Áp dụng các tính chất của lập trình hướng đối tượng (OOP)
 
 - **Đa hình (Polymorphism)**
