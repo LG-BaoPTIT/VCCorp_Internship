@@ -46,7 +46,7 @@ public class HashMapExample {
 - Không cho phép các phần tử trùng lặp.
 - Cho phép một phần tử là null.
 - Thời gian thao tác trung bình O(1) cho các hoạt động thêm, xóa và kiểm tra sự tồn tại của phần tử.
-```java1
+```java
     import java.util.HashSet;
 
 public class HashSetExample {
