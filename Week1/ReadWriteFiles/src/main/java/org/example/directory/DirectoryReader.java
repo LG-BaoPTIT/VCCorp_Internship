@@ -45,7 +45,7 @@ public class DirectoryReader {
     }
 
     public static void main(String[] args) {
-        String directoryPath = "./src";
+        String directoryPath = "./ReadWriteFiles/src";
 
         listFilesAndReadContent(directoryPath);
     }

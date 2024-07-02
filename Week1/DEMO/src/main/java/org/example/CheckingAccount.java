@@ -12,10 +12,11 @@ public class CheckingAccount extends Account {
         return overdraftLimit;
     }
 
+
+
     @Override
     public void withdraw(double amount) {
         double availableBalance = getBalance() + overdraftLimit;
-
         if (amount > 0 && amount <= availableBalance) {
             setBalance(getBalance() - amount);
             System.out.println("Withdrawal of $" + amount + " successful.");
