@@ -1,8 +1,4 @@
 # Báo cáo tuần 3
-Các công việc đã làm:
-- a 
-- b
-
 
 ## 1.Exception
 ### Checked Exception

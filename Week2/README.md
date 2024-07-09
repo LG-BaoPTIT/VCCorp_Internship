@@ -1,8 +1,4 @@
 # Báo cáo tuần 2
-Các công việc đã làm:
-- a 
-- b
-
 
 ## 1.Collections
 
