@@ -6,9 +6,9 @@ import java.util.List;
 public class ClientTest {
     public static void main(String[] args) {
         List<Employee> employees = new ArrayList<>();
-        employees.add(new Employee("Alice", 50000));
-        employees.add(new Employee("Bob", 60000));
-        employees.add(new Employee("Charlie", 70000));
+        employees.add(new Employee("A", 50000));
+        employees.add(new Employee("B", 60000));
+        employees.add(new Employee("C", 70000));
 
         Company company = new Company(employees);
         Iterator<Employee> iterator = company.createIterator();

@@ -42,6 +42,7 @@ public class Main {
         set.add(new Person("Alice", 30));
         set.add(new Person("Bob", 25));
         set.add(new Person("Alice", 30));
+        
 
         System.out.println("HashSet:");
         for (Person person : set) {
