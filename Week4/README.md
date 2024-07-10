@@ -1,6 +1,6 @@
 # Báo cáo tuần 4
 
-Trong MySQL, các thành phần quan trọng như vật lí, parser, optimizer và các loại storage engine đóng vai trò quan trọng trong quản lý cơ sở dữ liệu. Dưới đây là mô tả chi tiết về mỗi thành phần này:
+# Yêu cầu 1
 
 ### 1. Vật lí (Physical Layer)
 
@@ -46,7 +46,7 @@ Storage Engine là thành phần quản lý lưu trữ thực tế của dữ li
 
 Mỗi Storage Engine có các đặc điểm và tính năng riêng biệt, ảnh hưởng đến hiệu suất và tính năng của cơ sở dữ liệu MySQL. Người quản trị cơ sở dữ liệu thường lựa chọn Storage Engine phù hợp dựa trên yêu cầu cụ thể của ứng dụng và mục đích sử dụng.
 
-# Tối ưu hóa câu lệnh;
+# Yêu cầu 2.
 
   ![table employees](table.png)
   ![table](table2.png)
@@ -170,3 +170,40 @@ JOIN customers ON orders.customer_id = customers.customer_id;
 +----+-------------+-----------+------------+--------+---------------------+-------------+---------+-------------------------+--------+----------+-------------+
 
 ```
+
+##  Sử dụng LIKE với ký tự wildcard đầu tiên
+
+
+
+
+
+# Yêu cầu 3.
+
+### Các loại Cơ sở dữ liệu SQL (Relational Databases):
+1. **MySQL**: Đây là một hệ quản trị cơ sở dữ liệu quan hệ mã nguồn mở phổ biến, hỗ trợ nhiều tính năng như giao transact (ACID), tương thích đa nền tảng.
+   
+2. **PostgreSQL**: Một hệ quản trị cơ sở dữ liệu quan hệ mã nguồn mở mạnh mẽ, hỗ trợ các tính năng phong phú bao gồm ACID, JSON, và mở rộng với PostGIS cho địa lý.
+
+3. **Oracle Database**: Là một hệ quản trị cơ sở dữ liệu mạnh mẽ, cung cấp tính năng ACID, hỗ trợ quản lý dữ liệu lớn và các tính năng quản lý cao cấp.
+
+### Các loại Cơ sở dữ liệu NoSQL:
+1. **MongoDB**: Là một cơ sở dữ liệu NoSQL dạng tài liệu, lưu trữ dữ liệu dưới dạng JSON-like document, linh động và dễ mở rộng.
+
+2. **Redis**: Là một cơ sở dữ liệu NoSQL dạng key-value, hỗ trợ lưu trữ dữ liệu tại bộ nhớ, phù hợp cho các ứng dụng yêu cầu thời gian phản hồi nhanh.
+
+3. **Cassandra**: Là một cơ sở dữ liệu NoSQL dạng cột, được thiết kế cho các hệ thống phân tán quy mô lớn, hỗ trợ tính mở rộng tuyến tính.
+
+### Các khái niệm quan trọng:
+- **CAP Theorem**: Định lý CAP quan điểm rằng trong một hệ thống phân tán, không thể đảm bảo đồng thời tính nhất quán (Consistency), sẵn sàng (Availability), và chịu chấp nhận được (Partition tolerance). Hệ thống chỉ có thể đạt được hai trong số ba yếu tố này cùng một lúc.
+  
+- **BASE**: Được đề xuất như một phương pháp thay thế cho ACID trong các hệ thống NoSQL, BASE đặc trưng cho Basically Available, Soft state, Eventual consistency. BASE cho phép hệ thống có thể đạt được khả năng sẵn sàng cao và độ nhất quán cuối cùng (eventual consistency).
+
+- **ACID**: Là một thuật ngữ dùng để mô tả tính chất của giao transact trong cơ sở dữ liệu quan hệ, bao gồm Atomicity (tính nguyên tử), Consistency (tính nhất quán), Isolation (tính độc lập), và Durability (tính bền vững).
+
+### Ba dạng chuẩn của CSDL (Normal Forms):
+1. **First Normal Form (1NF)**: Mỗi ô trong bảng chỉ chứa một giá trị duy nhất, không chứa các giá trị lặp lại.
+
+2. **Second Normal Form (2NF)**: Mọi thuộc tính không thuộc khóa chính phụ thuộc hoàn toàn vào khóa chính.
+
+3. **Third Normal Form (3NF)**: Mọi thuộc tính không thuộc khóa chính không phụ thuộc vào các thuộc tính phi khóa chính.
+
