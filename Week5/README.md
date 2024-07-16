@@ -6,7 +6,7 @@ Các service cần triển khai:
 - Admin service: https://github.com/LG-BaoPTIT/admin-service.git
 - Auth service: https://github.com/LG-BaoPTIT/auth-service.git
 - Notification service: https://github.com/LG-BaoPTIT/notification-service.git
-![System](Screenshot 2024-07-16 101644.png)
+![System](system.png)
 Chuẩn bị tài nguyên cho hệ thống:
 - Container redis
 - Container rabbitMQ
