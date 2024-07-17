@@ -171,11 +171,106 @@ JOIN customers ON orders.customer_id = customers.customer_id;
 
 ```
 
-##  Sử dụng LIKE với ký tự wildcard đầu tiên
+## Tối ưu với Full-Text Index
+```
+mysql> explain SELECT * FROM employees WHERE name LIKE '%Employee2%';
++----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
+| id | select_type | table     | partitions | type | possible_keys | key  | key_len | ref  | rows  | filtered | Extra       |
++----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
+|  1 | SIMPLE      | employees | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 99869 |    11.11 | Using where |
++----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
+1 row in set, 1 warning (0.00 sec)
+
+```
+```
+mysql> ALTER TABLE employees ADD FULLTEXT INDEX idx_name_fulltext (name);
+Query OK, 0 rows affected, 1 warning (0.98 sec)
+Records: 0  Duplicates: 0  Warnings: 1
+
+mysql> explain SELECT * FROM employees WHERE MATCH(name) AGAINST('Employee2' IN NATURAL LANGUAGE MODE);
++----+-------------+-----------+------------+----------+-------------------+-------------------+---------+-------+------+----------+-------------------------------+
+| id | select_type | table     | partitions | type     | possible_keys     | key               | key_len | ref   | rows | filtered | Extra                         |
++----+-------------+-----------+------------+----------+-------------------+-------------------+---------+-------+------+----------+-------------------------------+
+|  1 | SIMPLE      | employees | NULL       | fulltext | idx_name_fulltext | idx_name_fulltext | 0       | const |    1 |   100.00 | Using where; Ft_hints: sorted |
++----+-------------+-----------+------------+----------+-------------------+-------------------+---------+-------+------+----------+-------------------------------+
+1 row in set, 1 warning (0.00 sec)
 
 
+```
+## Truy vấn bổ sung với Composite Index
+```
+mysql> explain  SELECT * FROM orders WHERE order_date = '2023-07-16' and status = 'Pending' ;
++----+-------------+--------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+| id | select_type | table  | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra       |
++----+-------------+--------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+|  1 | SIMPLE      | orders | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 100167 |     1.00 | Using where |
++----+-------------+--------+------------+------+---------------+------+---------+------+--------+----------+-------------+
+1 row in set, 1 warning (0.00 sec)
 
+```
+```
+mysql> ALTER TABLE orders ADD INDEX idx_order_date_status (order_date,status);
+Query OK, 0 rows affected (0.16 sec)
+Records: 0  Duplicates: 0  Warnings: 0
 
+mysql> explain  SELECT * FROM orders WHERE order_date = '2023-07-16' and status = 'Pending' ;
++----+-------------+--------+------------+------+-----------------------+-----------------------+---------+-------------+------+----------+-------+
+| id | select_type | table  | partitions | type | possible_keys         | key                   | key_len | ref         | rows | filtered | Extra |
++----+-------------+--------+------------+------+-----------------------+-----------------------+---------+-------------+------+----------+-------+
+|  1 | SIMPLE      | orders | NULL       | ref  | idx_order_date_status | idx_order_date_status | 87      | const,const |    1 |   100.00 | NULL  |
++----+-------------+--------+------------+------+-----------------------+-----------------------+---------+-------------+------+----------+-------+
+1 row in set, 1 warning (0.00 sec)
+
+```
+## Sử dụng LIKE với wildcard ở đầu
+```
+mysql> explain select * from employees where name like '%em%';
++----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
+| id | select_type | table     | partitions | type | possible_keys | key  | key_len | ref  | rows  | filtered | Extra       |
++----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
+|  1 | SIMPLE      | employees | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 99764 |    11.11 | Using where |
++----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
+1 row in set, 1 warning (0.00 sec)
+
+```
+```
+mysql> create index idx_name_salary_position on employees(name,salary,position);
+Query OK, 0 rows affected (0.28 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> explain select * from employees where name like 'em%';
++----+-------------+-----------+------------+-------+-----------------------------------+--------------------------+---------+------+-------+----------+--------------------------+
+| id | select_type | table     | partitions | type  | possible_keys                     | key                      | key_len | ref  | rows  | filtered | Extra                    |
++----+-------------+-----------+------------+-------+-----------------------------------+--------------------------+---------+------+-------+----------+--------------------------+
+|  1 | SIMPLE      | employees | NULL       | range | idx_name,idx_name_salary_position | idx_name_salary_position | 402     | NULL | 49882 |   100.00 | Using where; Using index |
++----+-------------+-----------+------------+-------+-----------------------------------+--------------------------+---------+------+-------+----------+--------------------------+
+1 row in set, 1 warning (0.00 sec)
+
+```
+## Sử dụng subquery không cần thiết
+```
+mysql> explain select * from customers where customer_id in (select customer_id from orders where status = 'Pending');
++----+--------------+-------------+------------+--------+---------------------+---------+---------+-------------------------+--------+----------+-------------+
+| id | select_type  | table       | partitions | type   | possible_keys       | key     | key_len | ref                     | rows   | filtered | Extra       |
++----+--------------+-------------+------------+--------+---------------------+---------+---------+-------------------------+--------+----------+-------------+
+|  1 | SIMPLE       | <subquery2> | NULL       | ALL    | NULL                | NULL    | NULL    | NULL                    |   NULL |   100.00 | NULL        |
+|  1 | SIMPLE       | customers   | NULL       | eq_ref | PRIMARY,customer_id | PRIMARY | 4       | <subquery2>.customer_id |      1 |   100.00 | NULL        |
+|  2 | MATERIALIZED | orders      | NULL       | ALL    | customer_id         | NULL    | NULL    | NULL                    | 100167 |    10.00 | Using where |
++----+--------------+-------------+------------+--------+---------------------+---------+---------+-------------------------+--------+----------+-------------+
+3 rows in set, 1 warning (0.00 sec)
+
+```
+```
+mysql> explain select c.* from customers c join orders o on c.customer_id = o.customer_id where status = 'Pending';
++----+-------------+-------+------------+--------+---------------------+---------+---------+--------------------+--------+----------+-------------+
+| id | select_type | table | partitions | type   | possible_keys       | key     | key_len | ref                | rows   | filtered | Extra       |
++----+-------------+-------+------------+--------+---------------------+---------+---------+--------------------+--------+----------+-------------+
+|  1 | SIMPLE      | o     | NULL       | ALL    | customer_id         | NULL    | NULL    | NULL               | 100167 |    10.00 | Using where |
+|  1 | SIMPLE      | c     | NULL       | eq_ref | PRIMARY,customer_id | PRIMARY | 4       | test.o.customer_id |      1 |   100.00 | NULL        |
++----+-------------+-------+------------+--------+---------------------+---------+---------+--------------------+--------+----------+-------------+
+2 rows in set, 1 warning (0.00 sec)
+
+```
 
 # Yêu cầu 3.
 
