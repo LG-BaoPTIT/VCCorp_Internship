@@ -3,7 +3,7 @@ package org.example;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+//deadlock, live lock, starvation
 public class LockExample {
     private int count = 0;
     private final Lock lock = new ReentrantLock();
