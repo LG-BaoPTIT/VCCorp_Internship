@@ -19,19 +19,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<?> getUserById(Integer id) {
 
-//        User user = redisUserRepo.get(id);
-//        if(user != null){
-//            System.out.println("get from redis");
-//            return new ResponseEntity<>(user, HttpStatus.OK);
-//        }
+        User user = redisUserRepo.get(id);
+
+        if(user != null){
+            System.out.println("get from redis");
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }
         Optional<User> userOptional = userRepository.findById(id);
         if(!userOptional.isPresent()){
             return new ResponseEntity<>("User is not present",HttpStatus.NOT_FOUND);
         }
-       // redisUserRepo.put(userOptional.get());
+        redisUserRepo.put(userOptional.get());
         System.out.println("get from db");
 
         return new ResponseEntity<>(userOptional.get(),HttpStatus.OK);
-
     }
 }

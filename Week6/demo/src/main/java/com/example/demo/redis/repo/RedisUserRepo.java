@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 @Repository
 public class RedisUserRepo {
-    private static final String KEY = "USER_INFO";
+    private static final String KEY = "USER_HIHI";
     private static final long EXPIRATION_TIME = 6000;
     private final RedisTemplate<Object, Object> redisTemplate;
 
@@ -41,4 +41,13 @@ public class RedisUserRepo {
             // handle exception
         }
     }
+
+    public void putList(User user){
+        redisTemplate.opsForList().rightPush("LIST-USER",user);
+    }
+
+    public User getUserInList(int index){
+        return (User) redisTemplate.opsForList().index("LIST-USER",index);
+    }
+
 }
