@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: auth-service
+#  data:
+#    mongodb:
+#      host: localhost
+#      port: 27017
+#      database: db_authservice
+  data:
+    mongodb:
+      database: db_authservice
+      uri: mongodb+srv://trivm30092001:y2056XEHlqmKTpiP@cluster0.ipdtu5z.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+  redis:
+#    host: localhost
+    host: 172.19.0.4
+    port: 6379
+  rabbitmq:
+#    host: localhost
+    host: 172.19.0.3
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: core
+  jackson:
+    time-zone: Asia/Ho_Chi_Minh
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka
+
+server:
+  port: 9009
+
+jwt:
+  admin:
+    secretKey: adminite@123!456
+    expiration: 1800000
+    expiration-refresh-token: 1800000
+  ecommerce:
+    secretKey: ecomite@123!456
+    expiration: 1800000
+    expiration-refresh-token: 1800000
+
+signature:
+  admin:
+    privateKey: ite@adminServive+signature
+  ecommerce:
+    privateKey: ite@ecommerceServive+signature
+
+
+aes:
+  admin:
+    secretKey: ite@abcd
+  ecommerce:
+    secretKey: ite@abcdEcommerce
+
+
+
+
+
+
+
+
