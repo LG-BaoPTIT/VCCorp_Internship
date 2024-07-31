@@ -296,7 +296,7 @@ mysql> explain select c.* from customers c join orders o on c.customer_id = o.cu
 - **ACID**: Là một thuật ngữ dùng để mô tả tính chất của giao transact trong cơ sở dữ liệu quan hệ, bao gồm Atomicity (tính nguyên tử), Consistency (tính nhất quán), Isolation (tính độc lập), và Durability (tính bền vững).
 
 ### Ba dạng chuẩn của CSDL (Normal Forms):
-1. **First Normal Form (1NF)**: Mỗi ô trong bảng chỉ chứa một giá trị duy nhất, không chứa các giá trị lặp lại.
+1. **First Normal Form (1NF)**: Mỗi ô trong bảng chỉ chứa một giá trị duy nhất.
 
 2. **Second Normal Form (2NF)**: Mọi thuộc tính không thuộc khóa chính phụ thuộc hoàn toàn vào khóa chính.
 
