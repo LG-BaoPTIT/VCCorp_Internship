@@ -94,4 +94,44 @@ Redis áp dụng mô hình đơn luồng, nghĩa là tất cả các lệnh đ�
 - Event Loop điều phối và quản lý hiệu quả các tác vụ.
 
 ### Stress test
-![jmeter](jmeter.png)
+Các giá trị trong báo cáo tóm tắt (Summary Report) của JMeter :
+
+1. **Label**:
+    - **HTTP Request**: Tên của các sampler trong kế hoạch kiểm thử, ở đây là "HTTP Request".
+    - **TOTAL**: Tổng kết quả cho tất cả các HTTP requests trong kế hoạch kiểm thử.
+
+2. **# Samples**:
+    -  Số lượng mẫu (samples) đã được gửi đi trong quá trình kiểm thử. Mỗi mẫu đại diện cho một yêu cầu HTTP.
+
+3. **Average**:
+    - Thời gian phản hồi trung bình (theo milliseconds) cho tất cả các yêu cầu. Đây là thời gian trung bình mà server mất để phản hồi cho các yêu cầu HTTP.
+
+4. **Min**:
+    -  Thời gian phản hồi nhỏ nhất (theo milliseconds). Trong trường hợp này, giá trị 0 có thể do một vài yếu tố gây ra, như lỗi kết nối hoặc thời gian phản hồi cực nhanh (có thể là lỗi trong cấu hình kiểm thử).
+
+5. **Max**:
+    -  Thời gian phản hồi lớn nhất (theo milliseconds). Đây là thời gian lâu nhất mà server mất để phản hồi cho một yêu cầu.
+
+6. **Std. Dev. (Standard Deviation)**:
+    -  Độ lệch chuẩn của thời gian phản hồi, chỉ ra sự phân tán của thời gian phản hồi so với giá trị trung bình. Độ lệch chuẩn cao cho thấy có sự không nhất quán lớn trong thời gian phản hồi.
+
+7. **Error %**:
+    -  Tỷ lệ phần trăm của các yêu cầu bị lỗi. Ở đây, có 51.62% yêu cầu bị lỗi, nghĩa là hơn một nửa số yêu cầu không thành công.
+
+8. **Throughput**:
+    -  Tốc độ xử lý, hay số lượng yêu cầu được thực hiện mỗi giây.
+
+9. **Received KB/sec**:
+    - Lượng dữ liệu được nhận từ server mỗi giây, tính bằng kilobytes.
+
+10. **Sent KB/sec**:
+    -  Lượng dữ liệu được gửi đến server mỗi giây, tính bằng kilobytes.
+
+11. **Avg. Bytes**:
+    - Kích thước trung bình của mỗi phản hồi từ server, tính bằng bytes.
+
+### Trước khi dùng redis 
+![jmeter](jm1.png)
+
+### Sau khi sử dụng redis 
+![jmeter](jm2.png)
