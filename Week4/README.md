@@ -60,30 +60,37 @@ Dưới đây là kết quả của lệnh `EXPLAIN` trước và sau khi tạo 
 #### Trước khi tạo chỉ mục:
 
 ```sql
-EXPLAIN SELECT * FROM employees WHERE salary > 500000;
+EXPLAIN SELECT * FROM employees WHERE salary > 50000;
 ```
 
 ```
+-> Filter: (employees.salary > 50000.00)  (cost=10097 rows=33251) (actual time=0.145..57.5 rows=1 loops=1)
+    -> Table scan on employees  (cost=10097 rows=99764) (actual time=0.0843..46.4 rows=100000 loops=1)
+
 +----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
 | id | select_type | table     | partitions | type | possible_keys | key  | key_len | ref  | rows  | filtered | Extra       |
 +----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
-|  1 | SIMPLE      | employees | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 99869 |    33.33 | Using where |
+|  1 | SIMPLE      | employees | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 99764 |    33.33 | Using where |
 +----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
 ```
+
 
 #### Sau khi tạo chỉ mục:
 
 ```sql
 CREATE INDEX idx_salary ON employees(salary);
-EXPLAIN SELECT * FROM employees WHERE salary > 500000;
+EXPLAIN SELECT * FROM employees WHERE salary > 50000;
 ```
 
 ```
+-> Index range scan on employees using idx_salary over (50000.00 < salary), with index condition: (employees.salary > 50000.00)  (cost=0.71 rows=1) (actual time=0.0345..0.0396 rows=1 loops=1)
+
 +----+-------------+-----------+------------+-------+---------------+------------+---------+------+------+----------+-----------------------+
 | id | select_type | table     | partitions | type  | possible_keys | key        | key_len | ref  | rows | filtered | Extra                 |
 +----+-------------+-----------+------------+-------+---------------+------------+---------+------+------+----------+-----------------------+
 |  1 | SIMPLE      | employees | NULL       | range | idx_salary    | idx_salary | 6       | NULL |    1 |   100.00 | Using index condition |
 +----+-------------+-----------+------------+-------+---------------+------------+---------+------+------+----------+-----------------------+
+
 ```
 
 ### Phân tích chi tiết:
@@ -172,8 +179,13 @@ JOIN customers ON orders.customer_id = customers.customer_id;
 ```
 
 ## Tối ưu với Full-Text Index
+Before
 ```
 mysql> explain SELECT * FROM employees WHERE name LIKE '%Employee2%';
+
+-> Filter: (employees.`name` like '%Luu%')  (cost=10097 rows=11084) (actual time=0.121..65.9 rows=2 loops=1)
+    -> Table scan on employees  (cost=10097 rows=99764) (actual time=0.085..42.5 rows=100000 loops=1)
+
 +----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
 | id | select_type | table     | partitions | type | possible_keys | key  | key_len | ref  | rows  | filtered | Extra       |
 +----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
@@ -182,10 +194,15 @@ mysql> explain SELECT * FROM employees WHERE name LIKE '%Employee2%';
 1 row in set, 1 warning (0.00 sec)
 
 ```
+After
 ```
 mysql> ALTER TABLE employees ADD FULLTEXT INDEX idx_name_fulltext (name);
 Query OK, 0 rows affected, 1 warning (0.98 sec)
 Records: 0  Duplicates: 0  Warnings: 1
+
+-> Filter: (match employees.`name` against ('Luu'))  (cost=0.35 rows=1) (actual time=0.0415..0.0472 rows=2 loops=1)
+    -> Full-text index search on employees using idx_name_fulltext (name='Luu')  (cost=0.35 rows=1) (actual time=0.0395..0.0449 rows=2 loops=1)
+
 
 mysql> explain SELECT * FROM employees WHERE MATCH(name) AGAINST('Employee2' IN NATURAL LANGUAGE MODE);
 +----+-------------+-----------+------------+----------+-------------------+-------------------+---------+-------+------+----------+-------------------------------+
@@ -200,6 +217,9 @@ mysql> explain SELECT * FROM employees WHERE MATCH(name) AGAINST('Employee2' IN 
 ## Truy vấn bổ sung với Composite Index
 ```
 mysql> explain  SELECT * FROM orders WHERE order_date = '2023-07-16' and status = 'Pending' ;
+-> Filter: ((orders.`status` = 'Pending') and (orders.order_date = TIMESTAMP'2023-07-16 04:28:12'))  (cost=10128 rows=1002) (actual time=0.511..64.2 rows=1 loops=1)
+    -> Table scan on orders  (cost=10128 rows=100167) (actual time=0.121..49.5 rows=100000 loops=1)
+
 +----+-------------+--------+------------+------+---------------+------+---------+------+--------+----------+-------------+
 | id | select_type | table  | partitions | type | possible_keys | key  | key_len | ref  | rows   | filtered | Extra       |
 +----+-------------+--------+------------+------+---------------+------+---------+------+--------+----------+-------------+
@@ -214,6 +234,8 @@ Query OK, 0 rows affected (0.16 sec)
 Records: 0  Duplicates: 0  Warnings: 0
 
 mysql> explain  SELECT * FROM orders WHERE order_date = '2023-07-16' and status = 'Pending' ;
+
+-> Index lookup on orders using idx_orderDate_status (order_date=TIMESTAMP'2023-07-16 04:28:12', status='Pending')  (cost=0.35 rows=1) (actual time=0.0371..0.0397 rows=1 loops=1)
 +----+-------------+--------+------------+------+-----------------------+-----------------------+---------+-------------+------+----------+-------+
 | id | select_type | table  | partitions | type | possible_keys         | key                   | key_len | ref         | rows | filtered | Extra |
 +----+-------------+--------+------------+------+-----------------------+-----------------------+---------+-------------+------+----------+-------+
@@ -222,34 +244,18 @@ mysql> explain  SELECT * FROM orders WHERE order_date = '2023-07-16' and status 
 1 row in set, 1 warning (0.00 sec)
 
 ```
-## Sử dụng LIKE với wildcard ở đầu
-```
-mysql> explain select * from employees where name like '%em%';
-+----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
-| id | select_type | table     | partitions | type | possible_keys | key  | key_len | ref  | rows  | filtered | Extra       |
-+----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
-|  1 | SIMPLE      | employees | NULL       | ALL  | NULL          | NULL | NULL    | NULL | 99764 |    11.11 | Using where |
-+----+-------------+-----------+------------+------+---------------+------+---------+------+-------+----------+-------------+
-1 row in set, 1 warning (0.00 sec)
 
-```
-```
-mysql> create index idx_name_salary_position on employees(name,salary,position);
-Query OK, 0 rows affected (0.28 sec)
-Records: 0  Duplicates: 0  Warnings: 0
-
-mysql> explain select * from employees where name like 'em%';
-+----+-------------+-----------+------------+-------+-----------------------------------+--------------------------+---------+------+-------+----------+--------------------------+
-| id | select_type | table     | partitions | type  | possible_keys                     | key                      | key_len | ref  | rows  | filtered | Extra                    |
-+----+-------------+-----------+------------+-------+-----------------------------------+--------------------------+---------+------+-------+----------+--------------------------+
-|  1 | SIMPLE      | employees | NULL       | range | idx_name,idx_name_salary_position | idx_name_salary_position | 402     | NULL | 49882 |   100.00 | Using where; Using index |
-+----+-------------+-----------+------------+-------+-----------------------------------+--------------------------+---------+------+-------+----------+--------------------------+
-1 row in set, 1 warning (0.00 sec)
-
-```
 ## Sử dụng subquery không cần thiết
 ```
 mysql> explain select * from customers where customer_id in (select customer_id from orders where status = 'Pending');
+
+-> Nested loop inner join  (cost=23543 rows=10017) (actual time=68.3..175 rows=50097 loops=1)
+    -> Table scan on <subquery2>  (cost=12397..12525 rows=10017) (actual time=67.5..71.3 rows=50097 loops=1)
+        -> Materialize with deduplication  (cost=12397..12397 rows=10017) (actual time=67.5..67.5 rows=50097 loops=1)
+            -> Filter: (orders.`status` = 'Pending')  (cost=10089 rows=10017) (actual time=0.0701..49.5 rows=50097 loops=1)
+                -> Table scan on orders  (cost=10089 rows=100167) (actual time=0.064..33.7 rows=100000 loops=1)
+    -> Single-row index lookup on customers using PRIMARY (customer_id=`<subquery2>`.customer_id)  (cost=10017 rows=1) (actual time=0.00193..0.00195 rows=1 loops=50097)
+
 +----+--------------+-------------+------------+--------+---------------------+---------+---------+-------------------------+--------+----------+-------------+
 | id | select_type  | table       | partitions | type   | possible_keys       | key     | key_len | ref                     | rows   | filtered | Extra       |
 +----+--------------+-------------+------------+--------+---------------------+---------+---------+-------------------------+--------+----------+-------------+
@@ -262,6 +268,11 @@ mysql> explain select * from customers where customer_id in (select customer_id 
 ```
 ```
 mysql> explain select c.* from customers c join orders o on c.customer_id = o.customer_id where status = 'Pending';
+-> Nested loop inner join  (cost=13595 rows=10017) (actual time=0.0921..138 rows=50097 loops=1)
+    -> Filter: (o.`status` = 'Pending')  (cost=10089 rows=10017) (actual time=0.0698..38.9 rows=50097 loops=1)
+        -> Table scan on o  (cost=10089 rows=100167) (actual time=0.0647..26.5 rows=100000 loops=1)
+    -> Single-row index lookup on c using PRIMARY (customer_id=o.customer_id)  (cost=0.25 rows=1) (actual time=0.00179..0.00182 rows=1 loops=50097)
+
 +----+-------------+-------+------------+--------+---------------------+---------+---------+--------------------+--------+----------+-------------+
 | id | select_type | table | partitions | type   | possible_keys       | key     | key_len | ref                | rows   | filtered | Extra       |
 +----+-------------+-------+------------+--------+---------------------+---------+---------+--------------------+--------+----------+-------------+
@@ -271,7 +282,14 @@ mysql> explain select c.* from customers c join orders o on c.customer_id = o.cu
 2 rows in set, 1 warning (0.00 sec)
 
 ```
+## Tránh Sử Dụng SELECT *
+```
+explain analyze select * from employees;
+   -> Table scan on employees  (cost=10097 rows=99764) (actual time=0.139..53.3 rows=100000 loops=1)
 
+explain analyze select employees.name from employees;
+   -> Table scan on employees  (cost=10097 rows=99764) (actual time=0.0749..29.7 rows=100000 loops=1)
+```
 # Yêu cầu 3.
 
 ### Các loại Cơ sở dữ liệu SQL (Relational Databases):

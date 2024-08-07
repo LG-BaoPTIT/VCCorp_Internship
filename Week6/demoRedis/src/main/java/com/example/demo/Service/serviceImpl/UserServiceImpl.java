@@ -25,6 +25,7 @@ public class UserServiceImpl implements UserService {
             System.out.println("get from redis");
             return new ResponseEntity<>(user, HttpStatus.OK);
         }
+
         Optional<User> userOptional = userRepository.findById(id);
         if(!userOptional.isPresent()){
             return new ResponseEntity<>("User is not present",HttpStatus.NOT_FOUND);
